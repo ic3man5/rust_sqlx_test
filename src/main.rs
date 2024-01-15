@@ -1,6 +1,6 @@
 use sqlx::postgres::PgPoolOptions;
 use sqlx::types::chrono::{DateTime, Utc};
-use std::io;
+use std::io::{self, Write};
 
 #[derive(Debug)]
 #[allow(dead_code)]
@@ -20,11 +20,13 @@ async fn main() -> Result<(), sqlx::Error> {
         .await?;
     // Lets create the user through user input
     print!("Please enter a user name: ");
+    io::stdout().flush().ok().expect("Could not flush stdout");
     let mut name = String::new();
     io::stdin()
         .read_line(&mut name)
         .expect("Failed to read username!");
-    print!("Please enter a description for {name}: ");
+    print!("Please enter a description for {}: ", name.trim());
+    io::stdout().flush().ok().expect("Could not flush stdout");
     let mut description = String::new();
     io::stdin()
         .read_line(&mut description)
@@ -49,7 +51,7 @@ async fn main() -> Result<(), sqlx::Error> {
     // Print all of them now
     for row in &results {
         println!(
-            "{}. Name: {} Description: {} Created: {}",
+            "{}.\tName: {}\n\tDescription: {}\n\tCreated: {}",
             row.id, row.name, row.description, row.created
         );
     }
